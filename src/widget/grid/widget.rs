@@ -105,7 +105,7 @@ where
         }
     }
 
-    fn on_event(
+    fn update(
         &mut self,
         state: &mut Tree,
         event: Event,
@@ -115,13 +115,12 @@ where
         clipboard: &mut dyn Clipboard,
         shell: &mut Shell<'_, Message>,
         viewport: &Rectangle,
-    ) -> event::Status {
-        let children_status = self
-            .elements_iter_mut()
+    ) {
+        self.elements_iter_mut()
             .zip(&mut state.children)
             .zip(layout.children())
-            .map(|((child, state), layout)| {
-                child.as_widget_mut().on_event(
+            .for_each(|((child, state), layout)| {
+                child.as_widget_mut().update(
                     state,
                     event.clone(),
                     layout,
@@ -132,8 +131,6 @@ where
                     viewport,
                 )
             });
-
-        children_status.fold(event::Status::Ignored, event::Status::merge)
     }
 
     fn mouse_interaction(
